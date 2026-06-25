@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oportunidades Internas — Grupo MCoutinho</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1a2030;color:#e8e8e8;padding:2rem 1.5rem;min-height:100vh}
+.page{max-width:1100px;margin:0 auto}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:24px;font-weight:600;color:#ffffff}
+.header p{font-size:14px;color:#9aa0ac;margin-top:4px}
+.top-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9aa0ac;font-size:16px;pointer-events:none}
+#search{width:100%;padding:8px 10px 8px 34px;font-size:14px;border-radius:8px;border:1px solid #2e3447;background:#252b3b;outline:none;color:#e8e8e8}
+#search::placeholder{color:#9aa0ac}
+#search:focus{border-color:#3e4560}
+.filter-dropdown{position:relative}
+.filter-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;font-size:13px;border-radius:8px;background:#252b3b;border:1px solid #2e3447;color:#e8e8e8;cursor:pointer;white-space:nowrap}
+.filter-btn:hover{background:#2e3447}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:10;background:#252b3b;border:1px solid #2e3447;border-radius:8px;padding:6px;min-width:170px;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.dropdown-menu.open{display:block}
+.dropdown-menu label{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:13px;color:#e8e8e8;cursor:pointer;border-radius:6px;white-space:nowrap}
+.dropdown-menu label:hover{background:#2e3447}
+.dropdown-menu input[type=checkbox]{accent-color:#00fff8;width:14px;height:14px}
+.counter{font-size:13px;color:#9aa0ac;margin-left:auto;padding:6px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{background:#252b3b;border:1px solid #2e3447;border-radius:12px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:10px;transition:border-color 0.15s}
+.card:hover{border-color:#3e4560}
+.card-title{font-size:15px;font-weight:600;color:#ffffff;line-height:1.3}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.tag-loc{background:transparent;border:1px solid #2e3447;color:#1a2d3d;background:#ffffff}
+.tag-vn{background:#3b5bdb;color:#ffffff}
+.tag-vo{background:#3b5bdb;color:#ffffff}
+.tag-apv{background:#2f9e44;color:#ffffff}
+.tag-col{background:#e67700;color:#ffffff}
+.tag-rac{background:#a61e4d;color:#ffffff}
+.tag-log{background:#6741d9;color:#ffffff}
+.tag-csp{background:#0c8599;color:#ffffff}
+.tag-pec{background:#6741d9;color:#ffffff}
+.card-link{margin-top:auto;font-size:12px;color:#00fff8;text-decoration:none;display:flex;align-items:center;gap:4px;font-weight:600;letter-spacing:0.02em}
+.card-link:hover{text-decoration:underline;text-underline-offset:3px}
+.no-results{text-align:center;padding:3rem 0;color:#9aa0ac;font-size:14px}
+.footer{margin-top:2rem;font-size:12px;color:#9aa0ac;text-align:center}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Oportunidades internas</h1>
+    <p>Grupo MCoutinho — processos de recrutamento em aberto</p>
+  </div>
+  <div class="top-bar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search" placeholder="Pesquisar funções...">
+    </div>
+    <div class="filter-dropdown" id="fd-loc">
+      <button class="filter-btn" onclick="toggleDD('loc')"><i class="ti ti-map-pin" style="font-size:15px"></i> Localização <i class="ti ti-chevron-down" style="font-size:13px"></i></button>
+      <div class="dropdown-menu" id="dm-loc"></div>
+    </div>
+    <div class="filter-dropdown" id="fd-area">
+      <button class="filter-btn" onclick="toggleDD('area')"><i class="ti ti-briefcase" style="font-size:15px"></i> Área <i class="ti ti-chevron-down" style="font-size:13px"></i></button>
+      <div class="dropdown-menu" id="dm-area"></div>
+    </div>
+    <span class="counter" id="counter"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="no-results" id="no-results" style="display:none">
+    <i class="ti ti-mood-sad" style="font-size:32px;display:block;margin-bottom:8px"></i>
+    Nenhuma vaga encontrada
+  </div>
+  <div class="footer">Para candidaturas internas, verifica os requisitos e envia candidatura para joao.barbosa@mcoutinho.pt após validação com a tua chefia.</div>
+</div>
+
+<script>
+const vagas=[
+  {f:"Atendedor Comercial",a:"VO",l:"Almada",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/661ddd4bf936-4f2c-bb87-c3c088f54a9d"},
+  {f:"Consultor de Serviço",a:"APV",l:"Almada",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/746e5edae64d-4e8c-a5d8-3a5be206c6f3"},
+  {f:"Atendedor Comercial",a:"VO",l:"Amarante | Marco de Canaveses",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/841a555fadb4-48f2-8885-df9aa7bb699b"},
+  {f:"Comercial de Automóveis",a:"VO",l:"Amarante | Marco de Canaveses",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/b6410b42-bbad-4b71-b57b-13ae26ec14d5"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Aveiro",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/1e5ab5afb2ee-442a-b74f-77fea6ef2b7d"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Bragança",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/8417bf6d5e93-4efb-aad7-f2e7c1269342"},
+  {f:"Consultor de Serviço",a:"APV",l:"Bragança",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/d9968e92-b6d1-42b2-a7db-22eb93583d2f"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Bragança",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/e1ad2be8-60ad-4465-8783-b2b4d8281d78"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Caldas da Rainha",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/473fe250-ae82-4f42-b940-12768c7d378a"},
+  {f:"Atendedor Comercial",a:"VN",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/1c5f328c404f-4d40-98aa-4d9363959858"},
+  {f:"Bate-Chapas",a:"Colisão",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/b87fcd5bb66f-4cf8-bd5a-f155dbab5aae"},
+  {f:"Caixeiro de Peças Júnior",a:"APV",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/04ba82b4-c6ac-469b-b4ca-7169d85367b0"},
+  {f:"Chefe de Oficina",a:"Colisão",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/6afef83a1719-4f83-ba97-f3e17e64be96"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/b238274c26aa-47e9-834d-e6626d4e2518"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/13e76466-3ef9-45b1-aaa5-5030e270206b"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Coimbra",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/5f62be8d5e2c-42df-99c8-eeb735f160ed"},
+  {f:"Chefe de Vendas",a:"VO",l:"Coimbra / Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/29bdc682-7c88-4eaf-8b3a-1ef22b9dc96a"},
+  {f:"Operador Shuttle/Motorista",a:"RAC",l:"Faro",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/6099132f2c5a-4165-8919-cd75d9adb5c8"},
+  {f:"Rececionista Rent-a-Car",a:"RAC",l:"Faro",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/84b2eb38-a818-44d5-9bed-6ec5d82ded61"},
+  {f:"Bate-Chapas",a:"Colisão",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/acf69d9c5ee8-4d1b-9c51-70581ae93015"},
+  {f:"Caixeiro de Peças",a:"APV",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/148e49cc6b86-4a06-aecc-19d9afeba0ed"},
+  {f:"Chefe de Oficina",a:"Colisão",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/94fb510e6669-4d7f-9086-6931b7577843"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/e0e0fd45-e7c9-42fe-a5a3-bdf5a57ecb2d"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/8ffeea83-ede7-47ce-91d1-2eddb8368587"},
+  {f:"Orçamentista",a:"Colisão",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/3211b5e3-53ad-4acf-9f22-573a6975cc6f"},
+  {f:"Rececionista de Oficina",a:"APV",l:"Leiria",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/ad55e468-ccc5-41ac-a92a-9e3b13e8308f"},
+  {f:"Bate-Chapas",a:"Colisão",l:"Lisboa",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/e59ca965-0663-4a83-9015-890eb9ab3256"},
+  {f:"Operador Shuttle/Motorista",a:"RAC",l:"Lisboa",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/9c8ed2a5-3bcc-4557-a38b-f0a6cd8e731a"},
+  {f:"Rececionista Rent-a-Car",a:"RAC",l:"Lisboa",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/5c466ceb1ec9-4526-b337-6426a1d23ea6"},
+  {f:"Técnico de Controlo de Qualidade",a:"APV",l:"Lisboa",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/c319a923-8327-4af2-9f55-6b278519c12b"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Lisboa | Loures",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/38a37942-be82-42e3-aa2c-590c3266a5d1"},
+  {f:"Bate-Chapas",a:"Colisão",l:"Loures",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/50dab4b3-8303-4183-a628-1947b5f2ac55"},
+  {f:"Consultor de Serviço",a:"APV",l:"Loures",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/4f7a914f1ab2-469f-b005-59346e8cdc6b"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Loures",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/5cda6a64-2127-4cc2-9146-27bfa892d790"},
+  {f:"Pintor",a:"Colisão",l:"Loures",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/4c6122a9-b8c4-4531-bc5f-a395d0351a44"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Maia",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/07492666-b5c3-46c5-ba6a-206e41769c83"},
+  {f:"Bate-Chapas",a:"Colisão",l:"Marco de Canaveses",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/3adad2a7-ae90-48cf-9a7d-1d2a8b17e495"},
+  {f:"Chefe de Oficina",a:"APV",l:"Marco de Canaveses",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/16407ad9-805a-45f8-ad55-7e4b2bca9678"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Marco de Canaveses",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/2dc53773-b792-4f69-964a-5f12e450dd5d"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Paredes",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/857f9775-5391-42e7-b5e0-3e55557fa99b"},
+  {f:"Operador de Call Center",a:"CSP",l:"Paredes",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/71c5e6ce5d51-4c11-ac6f-4ed99b63d76f"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Penafiel",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/f8ea59d1-2df0-4eef-84e7-6079bccb2e70"},
+  {f:"Atendedor Comercial",a:"VO",l:"Porto",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/d30c3040-cf43-437b-a9c4-5941ef95b614"},
+  {f:"Especialista de Avaliação / Compras / Pricing",a:"VO",l:"Porto",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/ca45deb3-ffc2-40fb-b327-fb548e6c9e66"},
+  {f:"Motorista",a:"Logística",l:"Porto",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/44b1880f6ae0-499d-8c97-b3d058be71f3"},
+  {f:"Operador de Armazém",a:"Peças",l:"Porto",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/c31774dc75e0-44a6-af78-1175d3ae1534"},
+  {f:"Técnico Administrativo",a:"VO",l:"Porto",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/c0447930-4f1b-453e-9949-2b642fc53576"},
+  {f:"Bate-Chapas",a:"VO",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/56fd6bbe146f-4904-bb6a-1c4bbb6f1e26"},
+  {f:"Coordenador de Mecânica",a:"VO",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/c26e4370-7c7b-418c-91df-5bf9d8cc53d7"},
+  {f:"Mecânico / Mecatrónico",a:"VO",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/a08b4cc0-7c0d-4f35-911f-1964ab5bb73a"},
+  {f:"Motorista",a:"Logística",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/145dda93-0694-44e0-9964-f36f79e7838e"},
+  {f:"Pintor",a:"VO",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/8257b403-34fd-4ec7-a54b-b37bd0042cc4"},
+  {f:"Responsável de Centro de Recondicionamento Automóvel",a:"VO",l:"Setúbal",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/78f49304-9f0f-4367-8633-9c4380b6f655"},
+  {f:"Atendedor Comercial",a:"VO",l:"Vila Real",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/2aee9bb0-3888-4039-b9b0-cb9ae57eff7c"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Vila Real",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/6f9d8bc1-4047-4dd7-bb48-5a9a4d9c527f"},
+  {f:"Comercial de Automóveis",a:"VO",l:"Vila Real",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/edd32578-06a9-45e1-9f21-f9a03850b7d5"},
+  {f:"Mecânico / Mecatrónico",a:"APV",l:"Vila Real",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/1bc402d0-6de9-4614-b4dd-057f333cf88c"},
+  {f:"Comercial de Automóveis",a:"VN",l:"Viseu",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/5f7b2924-9431-4513-b2da-a0db06c82ba2"},
+  {f:"Pintor",a:"Colisão",l:"Viseu",url:"https://www.mcoutinho.pt/quem-somos/recrutamento/474e78bfd43f-4789-89e1-b272489bfe21"}
+];
+
+const areaClass={
+  "VN":"tag-vn","VO":"tag-vo","APV":"tag-apv","Colisão":"tag-col",
+  "RAC":"tag-rac","Logística":"tag-log","CSP":"tag-csp","Peças":"tag-pec"
+};
+
+const locs=[...new Set(vagas.map(v=>v.l))].sort();
+const areas=[...new Set(vagas.map(v=>v.a))].sort();
+const dmLoc=document.getElementById('dm-loc');
+const dmArea=document.getElementById('dm-area');
+
+locs.forEach(l=>{
+  const lb=document.createElement('label');
+  lb.innerHTML=`<input type="checkbox" value="${l}" onchange="render()"> ${l}`;
+  dmLoc.appendChild(lb);
+});
+areas.forEach(a=>{
+  const lb=document.createElement('label');
+  lb.innerHTML=`<input type="checkbox" value="${a}" onchange="render()"> ${a}`;
+  dmArea.appendChild(lb);
+});
+
+function toggleDD(id){
+  const menu=document.getElementById('dm-'+id);
+  document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m.id!=='dm-'+id)m.classList.remove('open');});
+  menu.classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.filter-dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
+});
+function getChecked(dmId){
+  return [...document.querySelectorAll(`#${dmId} input:checked`)].map(i=>i.value);
+}
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const selLocs=getChecked('dm-loc');
+  const selAreas=getChecked('dm-area');
+  const grid=document.getElementById('grid');
+  const noRes=document.getElementById('no-results');
+  grid.innerHTML='';
+  const filtered=vagas.filter(v=>{
+    const matchQ=!q||v.f.toLowerCase().includes(q)||v.l.toLowerCase().includes(q)||v.a.toLowerCase().includes(q);
+    const matchL=!selLocs.length||selLocs.includes(v.l);
+    const matchA=!selAreas.length||selAreas.includes(v.a);
+    return matchQ&&matchL&&matchA;
+  });
+  document.getElementById('counter').textContent=`${filtered.length} vaga${filtered.length!==1?'s':''}`;
+  if(!filtered.length){noRes.style.display='block';return;}
+  noRes.style.display='none';
+  filtered.forEach(v=>{
+    const ac=areaClass[v.a]||'tag-vn';
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <div class="card-title">${v.f}</div>
+      <div class="tags">
+        <span class="tag tag-loc"><i class="ti ti-map-pin" style="font-size:11px"></i> ${v.l}</span>
+        <span class="tag ${ac}">${v.a}</span>
+      </div>
+      <a class="card-link" href="${v.url}" target="_blank">Ver perfil <i class="ti ti-external-link" style="font-size:13px"></i></a>`;
+    grid.appendChild(card);
+  });
+}
+render();
+document.getElementById('search').addEventListener('input',render);
+</script>
+</body>
+</html>
